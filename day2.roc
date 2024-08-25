@@ -11,16 +11,13 @@ import "./day2-input.txt" as inputFile : Str
 main =
     fileLines = List.keepIf (Str.split inputFile "\n") \line -> Bool.isNotEq line ""
     gamesPlayed = List.map fileLines \lines -> parsedLine lines
-    bagActualContent = { red: 12, green: 13, blue: 14 }
-    sumOfGameIndexes = List.sum (keepPossibleGamesIndexes gamesPlayed bagActualContent)
-    Stdout.line! "Sum of game indexes $(Inspect.toStr sumOfGameIndexes)"
+    gamesPowers = List.map gamesPlayed gamePower
+    sumOfGamePowers = List.sum gamesPowers
+    Stdout.line! "Sum of game indexes $(Inspect.toStr sumOfGamePowers)"
 
-sumOfValidGamesIndexes = \games, bagContent ->
-    possibleGames = keepPossibleGamesIndexes games bagContent
-
-    List.sum possibleGames
-
-expect sumOfValidGamesIndexes testGames { red: 32, green: 33, blue: 34 } == 6
+gamePower = \game ->
+    maxOfEachColorInGame game
+    |> \{ red, blue, green } -> red * blue * green
 
 maxOfEachColorInGame = \game ->
     List.walk game.reveals { red: 0, blue: 0, green: 0 } \state, reveal -> {
@@ -39,15 +36,9 @@ testGame = {
 }
 expect maxOfEachColorInGame testGame == { red: 18, green: 13, blue: 32 }
 
-keepPossibleGamesIndexes = \games, bagContent ->
-    List.keepIf games \game -> gameIsValid game bagContent
-    |> List.map \{ game } -> game
-
-gameIsValid = \game, bagContent ->
-    maxGame = maxOfEachColorInGame game
-    (Num.isGte bagContent.red maxGame.red)
-    && (Num.isGte bagContent.green maxGame.green)
-    && (Num.isGte bagContent.blue maxGame.blue)
+expect
+    power = gamePower testGame
+    power == 18 * 13 * 32
 
 testGames = [
     {
@@ -75,6 +66,10 @@ testGames = [
         ],
     },
 ]
+
+expect
+    sumOfPowers = List.map testGames gamePower |> List.sum
+    sumOfPowers == 18 * 13 * 19 + 12 * 13 * 14 + 12 * 13 * 19
 
 parsedLine = \strLine ->
     gameAndReveals =
