@@ -1,12 +1,10 @@
 module [
     u8ToUtfNumber,
-    isSome,
-    isNone,
-    keepSomes
 ]
 
-Option a : [Some a, None]
+import Option exposing [Option]
 
+u8ToUtfNumber : U8 -> Option U8
 u8ToUtfNumber = \u8Number ->
     when u8Number is
         48 -> Some 0
@@ -19,23 +17,4 @@ u8ToUtfNumber = \u8Number ->
         55 -> Some 7
         56 -> Some 8
         57 -> Some 9
-        _ -> None 
-
-isSome : Option a -> Bool
-isSome = \maybeValue ->
-    when maybeValue is
-        Some _ -> Bool.true
-        _ -> Bool.false
-
-isNone : Option a -> Bool
-isNone = \maybeValue ->
-    when maybeValue is
-        None -> Bool.true
-        _ -> Bool.false
-
-keepSomes : List (Option a) -> (List a)
-keepSomes = \options ->
-    List.walk options [] \state, option ->
-        when option is
-            Some d -> List.concat state [d]
-            None -> state
+        _ -> None
